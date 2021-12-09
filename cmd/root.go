@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/sagacious-labs/kcli/cmd/plugin"
+	"github.com/sagacious-labs/kcli/cmd/system"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -74,4 +75,5 @@ func initConfig() {
 
 func setupCommands() {
 	rootCmd.AddCommand(plugin.PluginCmd)
+	rootCmd.AddCommand(system.SystemCmd)
 }
