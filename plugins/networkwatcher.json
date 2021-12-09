@@ -1,0 +1,18 @@
+{
+    "module": {
+        "core": {
+            "name": "NetworkWatcher"
+        },
+        "metadata": {
+            "labels": {
+                "app": "NetworkWatcher"
+            },
+            "release": {
+                "linuxAMD64": {
+                    "location": "file:///usr/share/hyperion/wodule/hyperion-network-watcher",
+                    "sha256": "00"
+                }
+            }
+        }
+    }
+}
