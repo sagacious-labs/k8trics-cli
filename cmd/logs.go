@@ -27,6 +27,12 @@ import (
 var logsCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "logs can be used to stream logs from the given plugin",
+	Example: `
+  # Get Logs from "plugin1"
+  kcli plugin logs <plugin1>
+  
+  # Get Logs from Hyperion Network Watcher
+  kcli plugin logs NetworkWatcher`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("only 1 argument is required")
@@ -42,14 +48,4 @@ var logsCmd = &cobra.Command{
 
 func init() {
 	pluginCmd.AddCommand(logsCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// logsCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// logsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
