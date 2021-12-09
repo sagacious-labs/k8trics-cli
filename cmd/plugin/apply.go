@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package plugin
 
 import (
 	"fmt"
@@ -46,7 +46,7 @@ var applyCmd = &cobra.Command{
 }
 
 func init() {
-	pluginCmd.AddCommand(applyCmd)
+	PluginCmd.AddCommand(applyCmd)
 
 	applyCmd.Flags().StringArrayVarP(&locations, "files", "f", nil, "Paths to the files which are to be applied")
 

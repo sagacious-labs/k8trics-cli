@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package plugin
 
 import (
 	"fmt"
@@ -23,20 +23,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-// getCmd represents the get command
-var getCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get will return info associated with the given plugin",
-	Long:  `Get will print info of the given plugin running on all of the Hyperion Agents`,
+// logsCmd represents the logs command
+var logsCmd = &cobra.Command{
+	Use:   "logs",
+	Short: "logs can be used to stream logs from the given plugin",
 	Example: `
-  # Print info of the given plugin
-  kcli plugin get <plugin>`,
+  # Get Logs from "plugin1"
+  kcli plugin logs <plugin1>
+  
+  # Get Logs from Hyperion Network Watcher
+  kcli plugin logs NetworkWatcher`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("only 1 argument is required")
 		}
 
-		if err := k8trics.New(viper.GetString("host")).Plugin().Get(args[0]); err != nil {
+		if err := k8trics.New(viper.GetString("host")).Plugin().StreamLog(args[0]); err != nil {
 			fmt.Println(err)
 		}
 
@@ -45,5 +47,5 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	pluginCmd.AddCommand(getCmd)
+	PluginCmd.AddCommand(logsCmd)
 }

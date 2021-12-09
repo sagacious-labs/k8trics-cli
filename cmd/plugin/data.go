@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package plugin
 
 import (
 	"fmt"
@@ -23,24 +23,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-// deleteCmd represents the delete command
-var deleteCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "Delete plugins from K8trics",
-	Long:  `Delete will send delete requests for plugin to K8trics server which will be forwarded to all of the Hyperion Agents`,
-	Example: `
-  # Delete a plugin named "NetworkWatcher"
-  kcli plugin delete NetworkWatcher
-  
-  # Delete multiple plugins
-  kcli plugin delete <plugin1> <plugin2> ...`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := k8trics.New(viper.GetString("host")).Plugin().Delete(args); err != nil {
+// dataCmd represents the data command
+var dataCmd = &cobra.Command{
+	Use:   "data",
+	Short: "data can be used to stream data from the plugin",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return fmt.Errorf("only 1 argument is required")
+		}
+
+		if err := k8trics.New(viper.GetString("host")).Plugin().StreamData(args[0]); err != nil {
 			fmt.Println(err)
 		}
+
+		return nil
 	},
 }
 
 func init() {
-	pluginCmd.AddCommand(deleteCmd)
+	PluginCmd.AddCommand(dataCmd)
 }
