@@ -17,6 +17,7 @@ package system
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -27,11 +28,21 @@ const (
 // SystemCmd represents the system command
 var SystemCmd = &cobra.Command{
 	Use:   "system",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "system subcommands help manage lifecycle of K8trics from CLI",
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+func getHyperionManifest() string {
+	if val := viper.GetString("hyperion"); val != "" {
+		return val
+	}
+
+	return hyperionManifest
+}
+
+func getK8tricsManifest() string {
+	if val := viper.GetString("k8trics"); val != "" {
+		return val
+	}
+
+	return k8tricsManifest
 }

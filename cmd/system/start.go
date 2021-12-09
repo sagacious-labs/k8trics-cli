@@ -40,7 +40,7 @@ func start() {
 		return
 	}
 
-	_, serr, err := kubectl.Apply([]string{hyperionManifest, k8tricsManifest})
+	_, serr, err := kubectl.Apply([]string{getHyperionManifest(), getK8tricsManifest()})
 	if err != nil {
 		color.Red(err.Error())
 		return

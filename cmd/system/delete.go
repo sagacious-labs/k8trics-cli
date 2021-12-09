@@ -40,7 +40,7 @@ func delete() {
 		return
 	}
 
-	_, serr, err := kubectl.Delete([]string{hyperionManifest, k8tricsManifest})
+	_, serr, err := kubectl.Delete([]string{getHyperionManifest(), getK8tricsManifest()})
 	if err != nil {
 		color.Red(err.Error())
 		return
