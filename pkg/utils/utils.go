@@ -34,6 +34,9 @@ func ConstructURL(segs ...string) string {
 	return u.String()
 }
 
+// ContainsString takes a string slice and the value which
+// needs to be searched inside the slice, if the value exists
+// the function returns true or else false
 func ContainsString(arr []string, val string) bool {
 	for _, v := range arr {
 		if v == val {
