@@ -21,17 +21,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// startCmd represents the start command
-var startCmd = &cobra.Command{
-	Use:   "start",
-	Short: "start installs Hyperion agents and K8trics server in the cluster",
+// setupCmd represents the start command
+var setupCmd = &cobra.Command{
+	Use:   "setup",
+	Short: "setup installs Hyperion agents and K8trics server in the cluster",
 	Run: func(cmd *cobra.Command, args []string) {
 		start()
 	},
 }
 
 func init() {
-	SystemCmd.AddCommand(startCmd)
+	SystemCmd.AddCommand(setupCmd)
 }
 
 func start() {
