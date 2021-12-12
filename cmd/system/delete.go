@@ -36,20 +36,20 @@ func init() {
 
 func delete() {
 	if !kubectl.Exists() {
-		color.Red("kubectl not found in $PATH")
+		color.Red("❌ kubectl not found in $PATH")
 		return
 	}
 
 	_, serr, err := kubectl.Delete([]string{getHyperionManifest(), getK8tricsManifest()})
 	if err != nil {
-		color.Red(err.Error())
+		color.Red("❌ ", err.Error())
 		return
 	}
 
 	if serr != "" {
-		color.Red("Something went wrong while deleted K8trics and its components")
+		color.Red("❌ Something went wrong while deleted K8trics and its components")
 		return
 	}
 
-	color.Green("Successfully deleted K8trics from Kubernetes Cluster")
+	color.Green("✅ Successfully deleted K8trics from Kubernetes Cluster")
 }
