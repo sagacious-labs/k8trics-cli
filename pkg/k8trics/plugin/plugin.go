@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/fatih/color"
 	sse "github.com/r3labs/sse/v2"
 	"github.com/sagacious-labs/kcli/pkg/k8trics/formatter"
 	"github.com/sagacious-labs/kcli/pkg/utils"
@@ -33,7 +34,11 @@ func (p *Plugin) Apply(locations []string) error {
 			return err
 		}
 
-		io.Copy(os.Stdout, resp.Body)
+		if resp.StatusCode == http.StatusCreated || resp.StatusCode == http.StatusOK {
+			color.Green("✅ Successfully applied plugin: %s", loc)
+		} else {
+			color.Red("❌ Failed to apply plugin: ", loc)
+		}
 	}
 
 	return nil
@@ -52,7 +57,11 @@ func (p *Plugin) Delete(names []string) error {
 			return err
 		}
 
-		io.Copy(os.Stdout, resp.Body)
+		if resp.StatusCode == http.StatusOK {
+			color.Green("✅ Successfully deleted plugin: %s", name)
+		} else {
+			color.Red("❌ Failed to deleted plugin: %s", name)
+		}
 	}
 
 	return nil
