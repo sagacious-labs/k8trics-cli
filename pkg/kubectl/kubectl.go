@@ -1,8 +1,6 @@
 package kubectl
 
 import (
-	"fmt"
-	"io"
 	"os/exec"
 )
 
@@ -19,29 +17,17 @@ func Exists() bool {
 // and returns its stdout, stderr, error
 func GenericExec(cmds []string) (string, string, error) {
 	cmd := exec.Command("kubectl", cmds...)
-	out, err := cmd.StdoutPipe()
+	outByt, err := cmd.Output()
 	if err != nil {
-		return "", "", fmt.Errorf("failed to get stdout pipe")
-	}
+		exitErr, ok := err.(*exec.ExitError)
+		if ok {
+			return "", string(exitErr.Stderr), err
+		}
 
-	er, err := cmd.StderrPipe()
-	if err != nil {
-		return "", "", fmt.Errorf("failed to get stderr pipe")
-	}
-
-	if err := cmd.Start(); err != nil {
 		return "", "", err
 	}
 
-	outByt := []byte{}
-	errByt := []byte{}
-
-	io.ReadFull(out, outByt)
-	io.ReadFull(er, errByt)
-
-	cmd.Wait()
-
-	return string(outByt), string(errByt), nil
+	return string(outByt), "", nil
 }
 
 func Apply(locs []string) (string, string, error) {

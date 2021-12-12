@@ -16,9 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/sagacious-labs/kcli/cmd/plugin"
 	"github.com/sagacious-labs/kcli/cmd/system"
 	"github.com/spf13/cobra"
@@ -68,12 +69,27 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		color.Yellow("⚠️  Failed to read config file")
+
+		color.Yellow("⚠️  Attempting to create default config file...")
+		if err := setupDefaultConfig(); err != nil {
+			color.Red("❌ Failed to create default config file")
+			os.Exit(1)
+		}
 	}
 }
 
 func setupCommands() {
 	rootCmd.AddCommand(plugin.PluginCmd)
 	rootCmd.AddCommand(system.SystemCmd)
+}
+
+func setupDefaultConfig() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filepath.Join(home, ".k8trics.yaml"), nil, 0644)
 }

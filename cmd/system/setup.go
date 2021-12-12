@@ -16,9 +16,13 @@ limitations under the License.
 package system
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/fatih/color"
 	"github.com/sagacious-labs/kcli/pkg/kubectl"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // setupCmd represents the start command
@@ -42,14 +46,65 @@ func start() {
 
 	_, serr, err := kubectl.Apply([]string{getHyperionManifest(), getK8tricsManifest()})
 	if err != nil {
-		color.Red(err.Error())
+		color.Red("❌ ", err.Error())
 		return
 	}
 
 	if serr != "" {
-		color.Red("Something went wrong while starting K8trics and its components")
+		color.Red("❌ Something went wrong while starting K8trics and its components")
 		return
 	}
 
-	color.Green("Successfully started K8trics in Kubernetes Cluster")
+	color.Green("✅ Successfully started K8trics in Kubernetes Cluster")
+
+	ep, err := findK8tricsLBEndpoint(30 * time.Second)
+	if err != nil {
+		color.Red("❌ Failed to get location of K8trics API Server")
+		return
+	}
+
+	viper.Set("host", ep)
+	if err := viper.WriteConfig(); err != nil {
+		color.Red("❌ Failed to write config file")
+		return
+	}
+
+	color.Green("✅ Successfully written config")
+	color.Green("✅ K8trics is ready to be used")
+}
+
+func findK8tricsLBEndpoint(timeout time.Duration) (string, error) {
+	sleeper := 1 * time.Second
+	start := time.Now()
+
+	for {
+		stdout, stderr, err := kubectl.GenericExec([]string{
+			"get",
+			"services",
+			"-n",
+			"k8trics",
+			"k8trics",
+			"-o=jsonpath={$.status.loadBalancer.ingress[0].ip}",
+		})
+
+		if stderr != "" || err != nil {
+			if start.Add(timeout).Before(time.Now()) {
+				// Sleep as the timeout time hasn't reached yet
+				time.Sleep(sleeper)
+
+				// Try again
+				continue
+			}
+
+			if stderr != "" {
+				return "", fmt.Errorf(stderr)
+			}
+
+			if err != nil {
+				return "", err
+			}
+		}
+
+		return stdout, nil
+	}
 }
