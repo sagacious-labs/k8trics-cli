@@ -63,7 +63,13 @@ func start() {
 		return
 	}
 
-	viper.Set("host", ep)
+	port, err := findK8tricsLBEndpointPort(30 * time.Second)
+	if err != nil {
+		color.Red("❌ Failed to get location of K8trics API Server")
+		return
+	}
+
+	viper.Set("host", fmt.Sprintf("%s:%s", ep, port))
 	if err := viper.WriteConfig(); err != nil {
 		color.Red("❌ Failed to write config file")
 		return
@@ -85,6 +91,42 @@ func findK8tricsLBEndpoint(timeout time.Duration) (string, error) {
 			"k8trics",
 			"k8trics",
 			"-o=jsonpath={$.status.loadBalancer.ingress[0].ip}",
+		})
+
+		if stderr != "" || err != nil {
+			if start.Add(timeout).Before(time.Now()) {
+				// Sleep as the timeout time hasn't reached yet
+				time.Sleep(sleeper)
+
+				// Try again
+				continue
+			}
+
+			if stderr != "" {
+				return "", fmt.Errorf(stderr)
+			}
+
+			if err != nil {
+				return "", err
+			}
+		}
+
+		return stdout, nil
+	}
+}
+
+func findK8tricsLBEndpointPort(timeout time.Duration) (string, error) {
+	sleeper := 1 * time.Second
+	start := time.Now()
+
+	for {
+		stdout, stderr, err := kubectl.GenericExec([]string{
+			"get",
+			"services",
+			"-n",
+			"k8trics",
+			"k8trics",
+			"-o=jsonpath={$.spec.ports[0].port}",
 		})
 
 		if stderr != "" || err != nil {
