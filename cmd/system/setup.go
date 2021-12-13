@@ -93,7 +93,7 @@ func findK8tricsLBEndpoint(timeout time.Duration) (string, error) {
 			"-o=jsonpath={$.status.loadBalancer.ingress[0].ip}",
 		})
 
-		if stderr != "" || err != nil {
+		if stderr != "" || err != nil || stdout == "" {
 			if start.Add(timeout).Before(time.Now()) {
 				// Sleep as the timeout time hasn't reached yet
 				time.Sleep(sleeper)

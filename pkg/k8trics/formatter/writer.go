@@ -22,35 +22,39 @@ func Write(data []byte, skips ...string) {
 	}
 
 	printFullLine()
-	printMap(dataMap, "", skips...)
+	prettyPrint(dataMap, "", false, skips...)
 }
 
-func printMap(data map[string]interface{}, prefix string, skips ...string) {
+func prettyPrint(data interface{}, prefix string, adjustFirst bool, skips ...string) {
+	switch c := data.(type) {
+	case map[string]interface{}:
+		fmt.Println()
+		prettyPrintMap(c, prefix, adjustFirst, skips...)
+	case []interface{}:
+		prettyPrintSlice(c, prefix, adjustFirst, skips...)
+	default:
+		fmt.Printf(" %v\n", c)
+	}
+}
+
+func prettyPrintMap(data map[string]interface{}, prefix string, adjustFirst bool, skips ...string) {
 	for k, v := range data {
+		// Skip the keys mentioned in the skips
 		if utils.ContainsString(skips, k) {
 			continue
 		}
 
-		fmt.Print(prefix)
-		color.New(color.FgHiGreen).Printf("%s:", k)
+		// Print the key with given prefix
+		color.New(color.FgHiGreen).Printf("%s%s:", prefix, k)
 
-		switch c := v.(type) {
-		case map[string]interface{}:
-			fmt.Println()
-			printMap(c, fmt.Sprintf("%s  ", prefix))
-		case []interface{}:
-			for _, val := range c {
-				fmt.Print("\n=>")
-				switch cv := val.(type) {
-				case map[string]interface{}:
-					printMap(cv, fmt.Sprintf("%s  ", prefix))
-				default:
-					fmt.Printf(" %v\n", c)
-				}
-			}
-		default:
-			fmt.Printf(" %v\n", c)
-		}
+		prettyPrint(v, generateWhitespacePrefix(len(prefix)+2), adjustFirst, skips...)
+	}
+}
+
+func prettyPrintSlice(data []interface{}, prefix string, adjustFirst bool, skips ...string) {
+	for _, val := range data {
+		fmt.Printf("\n%s-", prefix)
+		prettyPrint(val, generateWhitespacePrefix(len(prefix)+2), true, skips...)
 	}
 }
 
@@ -66,4 +70,14 @@ func printFullLine() {
 	}
 
 	color.New(color.FgMagenta).Println(line)
+}
+
+func generateWhitespacePrefix(num int) string {
+	prefix := ""
+
+	for i := 0; i < num; i++ {
+		prefix += " "
+	}
+
+	return prefix
 }
