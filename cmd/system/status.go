@@ -37,7 +37,7 @@ var statusCmd = &cobra.Command{
 		if checkK8trics() {
 			color.Green("✅ K8trics server is running and is in Healthy state")
 		} else {
-			color.Red("❌ K8trics servier is not in a healthy state")
+			color.Red("❌ K8trics server is not in a healthy state")
 		}
 	},
 }
