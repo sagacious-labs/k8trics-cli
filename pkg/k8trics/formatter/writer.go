@@ -38,6 +38,16 @@ func printMap(data map[string]interface{}, prefix string, skips ...string) {
 		case map[string]interface{}:
 			fmt.Println()
 			printMap(c, fmt.Sprintf("%s  ", prefix))
+		case []interface{}:
+			for _, val := range c {
+				fmt.Print("\n=>")
+				switch cv := val.(type) {
+				case map[string]interface{}:
+					printMap(cv, fmt.Sprintf("%s  ", prefix))
+				default:
+					fmt.Printf(" %v\n", c)
+				}
+			}
 		default:
 			fmt.Printf(" %v\n", c)
 		}

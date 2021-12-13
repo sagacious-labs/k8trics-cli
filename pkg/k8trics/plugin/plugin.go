@@ -1,8 +1,8 @@
 package plugin
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 
@@ -73,7 +73,23 @@ func (p *Plugin) Get(name string) error {
 		return err
 	}
 
-	io.Copy(os.Stdout, resp.Body)
+	idata := []interface{}{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&idata); err != nil {
+		return err
+	}
+
+	data := map[string]interface{}{
+		"data": map[string]interface{}{
+			"info": idata,
+		},
+	}
+	byt, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	formatter.Write(byt)
 
 	return nil
 }
